@@ -13,7 +13,6 @@ db.serialize(() => {
   db.run(`
   create table user
   (
-    id int auto_increment primary key,
     gender text not null,
     first_name text not null,
     last_name text not null,
