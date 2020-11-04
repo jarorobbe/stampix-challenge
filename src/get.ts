@@ -4,13 +4,7 @@ import * as path from 'path';
 exports.handler = (event: any, context: any, callback: any) => {
   // Open database connection
   const filePath = path.join(__dirname, '../src/db.sqlite');
-  const db = new sqlite3.Database(filePath, (err: any) => {
-    if (err) {
-      console.log(err);
-    } else {
-      console.log('Database succesfully opened!');
-    }
-  });
+  const db = new sqlite3.Database(filePath);
 
   const id = event.pathParameters.id;
 

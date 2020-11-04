@@ -3,6 +3,7 @@ service:
 
 plugins:
   - serverless-offline
+  - serverless-jest-plugin
 
 package:
   individually: true
