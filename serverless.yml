@@ -42,5 +42,5 @@ functions:
           method: post
           path: /user
       - httpApi:
-          method: option
+          method: options
           path: /user
