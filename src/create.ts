@@ -1,7 +1,8 @@
 import * as sqlite3 from 'sqlite3';
 import * as path from 'path';
 
-exports.handler = (event: any, context: any, callback: any) => {
+// Handler for callback/create lambda function
+exports.handler = async (event: any, context: any, callback: any) => {
   // Open database connection
   const filePath = path.join(__dirname, '../src/db.sqlite');
   const db = new sqlite3.Database(filePath);
@@ -11,35 +12,39 @@ exports.handler = (event: any, context: any, callback: any) => {
 
   if (event.httpMethod == 'POST' || event.httpMethod == 'OPTIONS') {
     // Add the new user to the database by reading the request body
+
     try {
       const body = JSON.parse(event.body);
-      const statement = db.prepare(query);
-      statement.run(
+      const user = [
         body.gender,
         body.first_name,
         body.last_name,
         body.email,
         body.phone_number,
         body.date_of_birth,
-        body.language
-      );
-      statement.finalize();
+        body.language,
+      ];
+      await db.run(query, user);
       callback(null, {
         statusCode: 200,
-        message: 'User successfully added!',
+        body: JSON.stringify({ message: 'User added' }),
       });
     } catch (err) {
       console.log(err);
       callback(null, {
         statusCode: 400,
-        message: err,
+        body: JSON.stringify({
+          message: err,
+        }),
       });
     }
   } else {
     // Requests methods != OPTIONS/POST are not allowed
     callback(null, {
       statusCode: 400,
-      message: 'Request denied.',
+      body: JSON.stringify({
+        message: 'Request denied',
+      }),
     });
   }
 

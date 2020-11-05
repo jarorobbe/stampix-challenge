@@ -9,16 +9,36 @@ const jestPlugin = require('serverless-jest-plugin');
 const lambdaWrapper = jestPlugin.lambdaWrapper;
 const wrapped = lambdaWrapper.wrap(mod, { handler: 'handler' });
 
-describe('test create function', () => {
-  beforeAll((done) => {
-    //  lambdaWrapper.init(liveFunction); // Run the deployed lambda
+// Main test suite for the callback/create lambda function
+describe('Add a user', () => {
+  // Define the user that will be added to the database during the test
+  const user = {
+    gender: 'male',
+    first_name: 'Sonic',
+    last_name: 'DD',
+    email: 'dr@eggman.gg',
+    date_of_birth: '1595817691623.0',
+    phone_number: '493-860-9526 x644',
+    language: 'en',
+  };
 
-    done();
-  });
+  const event = {
+    httpMethod: 'OPTIONS',
+    body: JSON.stringify(user),
+  };
 
+  // Test which adds a new user to the database
+  // Test succeeds if statusCode=200 and the correct message is given
   it('test creation of new user', () => {
-    return wrapped.run({}).then((response) => {
-      expect(response).toBeDefined();
+    return wrapped.run(event).then((response) => {
+      expect(response.statusCode).toBe(200);
+      expect(response.body).toBe(
+        JSON.stringify({
+          message: 'User added',
+        })
+      );
     });
   });
 });
+
+// TODO: Add function that wipes the new user from the database

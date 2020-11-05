@@ -9,32 +9,95 @@ const jestPlugin = require('serverless-jest-plugin');
 const lambdaWrapper = jestPlugin.lambdaWrapper;
 const wrapped = lambdaWrapper.wrap(mod, { handler: 'handler' });
 
-describe('list', () => {
-  beforeAll((done) => {
-    //  lambdaWrapper.init(liveFunction); // Run the deployed lambda
+const sqlite3 = require('sqlite3');
+const path = require('path');
 
+const dbFile = path.join(__dirname, '../src/db.sqlite');
+const db = new sqlite3.Database(dbFile);
+
+// Main test suite for the list lambda function
+describe('list', () => {
+  // Initialize database before starting the test
+  beforeAll((done) => {
+    initDb();
     done();
   });
 
-  it('test fetching all users', () => {
-    return wrapped.run({}).then((response) => {
-      const body = JSON.parse(response.body);
+  // Clean up database after completing the test
+  afterAll((done) => {
+    cleanDb();
+    done();
+  });
+
+  const event1 = {
+    httpMethod: 'GET',
+  };
+
+  const event2 = {
+    httpMethod: 'OPTIONS',
+    body: JSON.stringify({
+      first_name: 'DrEggman',
+    }),
+  };
+
+  // Test 1 from the list test suite
+  // Fetches all the users from the database
+  // Test succeeds if statusCode=200
+  it('fetching all users', async () => {
+    return wrapped.run(event1).then((response) => {
       expect(response.statusCode).toBe(200);
+    });
+  });
+
+  // Test 2 from the list test suite
+  // Fetches the user created in the initDb method
+  // The test succeeds if statusCode=200 and the response body corresponds to the user
+  it('fetching some users', async () => {
+    return wrapped.run(event2).then((response) => {
+      expect(response.statusCode).toBe(200);
+      expect(response.body).toBe(
+        JSON.stringify({
+          users: [
+            {
+              gender: 'male',
+              first_name: 'DrEggman',
+              last_name: 'DD',
+              email: 'dr@eggman.gg',
+              phone_number: '493-860-9526 x644',
+              date_of_birth: '1604002480203.0',
+              language: 'en',
+              created_at: '2020-12-04 10:21:46',
+              modified_at: '2020-12-04 10:21:46',
+            },
+          ],
+        })
+      );
     });
   });
 });
 
-describe('list', () => {
-  beforeAll((done) => {
-    //  lambdaWrapper.init(liveFunction); // Run the deployed lambda
+// This method adds a user to the database
+const initDb = () => {
+  const stmt = db.prepare(
+    'INSERT INTO user (rowid, gender, first_name, last_name, email, phone_number, date_of_birth, language, created_at, modified_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+  );
+  stmt.run(
+    0,
+    'male',
+    'DrEggman',
+    'DD',
+    'dr@eggman.gg',
+    '493-860-9526 x644',
+    '1604002480203.0',
+    'en',
+    '2020-12-04 10:21:46',
+    '2020-12-04 10:21:46'
+  );
+  stmt.finalize();
+};
 
-    done();
-  });
-
-  it('test fetching some users', () => {
-    return wrapped.run({}).then((response) => {
-      const body = JSON.parse(response.body);
-      expect(response.statusCode).toBe(200);
-    });
-  });
-});
+// This method deletes the user created in the initDb() method
+const cleanDb = () => {
+  db.run(`DELETE FROM user WHERE rowid=?`, 0);
+  db.close();
+};

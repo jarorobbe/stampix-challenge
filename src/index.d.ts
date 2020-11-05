@@ -1,4 +1,4 @@
 // sqlite3
-// If this is not declared,
 // the compiler will complain about the type of imported module
+// if this is not declared
 declare module 'sqlite3';
