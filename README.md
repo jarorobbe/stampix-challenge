@@ -41,13 +41,16 @@ Suppose we want to set up a search function for the users where we can search wi
 
 ### Your answers
 
-1. Scalability (# of users increases over 10,000)
+#### 1. Scalability (# of users increases over 10,000)
+
 If the amount of users increases, our database will get a lot more records as each user has its own record. So I would start with doing additional research on our database technology to make sure that our database is able to scale and will not cause any bottlenecks. Additionally, searching based on names will become slower as the amount of records increases. For this reason looking towards indexes for data fields like first_name and last_name that are used to seach for users can be beneficial. I would also try make sure that my AWS Functions are as lightweight as possible. Tools like serverless-plugin-reducer could be used to make sure that only the necessary dependencies are uploaded. 
 
-2. Different database
+#### 2. Different database
+
 When using a different database or migrating our application to a different database, I would make sure to define the database models, rather than just creating a database with a script. A possible way of doing this, is by creating a class for each model in our database. This enables us to separate the service and business concerns from our database related stuff. In other words, we can keep our database related methods in their own separate modules. This eases the development of additional API endpoints and unit tests and could also eliminate some duplicate code. 
 
-3. Search function for users with arbitrary input
+#### 3. Search function for users with arbitrary input
+
 The first solution that comes to mind is to add the type of attribute that is used when searching. This could then be substituted into our query. Another solution could use MySQL's composite indexes. These are indexes which span over a max of 16 columns and thus could enable us to search for an index over multiple columns. 
 
 ## Delivery
