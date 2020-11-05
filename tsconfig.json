@@ -16,7 +16,7 @@
     "noImplicitUseStrict": false,
     "noStrictGenericChecks": false,
     "noUnusedLocals": true,
-    "noUnusedParameters": false,
+    "noUnusedParameters": true,
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "strict": true,
@@ -30,9 +30,5 @@
     "strictFunctionTypes": true,
     "strictPropertyInitialization": true
   },
-  "include": ["src/**/*"],
-  "typeRoots": [
-    "./typings/",
-    "./node_modules/@types/"
-  ]
+  "include": ["src/**/*"]
 }
